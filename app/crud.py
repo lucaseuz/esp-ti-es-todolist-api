@@ -29,3 +29,9 @@ def delete_task(db: Session, db_task: models.Task):
     db.delete(db_task)
     db.commit()
     return db_task
+
+def get_stats(db: Session):
+    total = db.query(models.Task).count()
+    pending = db.query(models.Task).filter(models.Task.completed == False).count()
+    completed = db.query(models.Task).filter(models.Task.completed == True).count()
+    return {"total": total, "pending": pending, "completed": completed}

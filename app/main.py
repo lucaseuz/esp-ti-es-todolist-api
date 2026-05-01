@@ -36,6 +36,11 @@ def read_tasks(
     tasks = crud.get_tasks(db, skip=skip, limit=limit, completed=completed)
     return tasks
 
+@app.get("/tasks/stats")
+def read_stats(db: Session = Depends(get_db)):
+    """Retorna o total de tarefas, pendentes e concluídas."""
+    return crud.get_stats(db)
+
 @app.get("/tasks/{task_id}", response_model=schemas.Task)
 def read_task(task_id: int, db: Session = Depends(get_db)):
     db_task = crud.get_task(db, task_id=task_id)

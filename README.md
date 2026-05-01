@@ -1,99 +1,195 @@
 # To-Do List (MVP)
 
-Uma API RESTful minimalista de To-Do List construída com **Python**, **FastAPI**, **SQLAlchemy** e **SQLite**.
-
-Este projeto demonstra fundamentos de engenharia de software, incluindo organização modular, validações de dados via Pydantic e testes automatizados.
-
-## 🚀 Funcionalidades
-- **Criar Tarefa:** Adiciona uma nova tarefa com título (obrigatório) e descrição.
-- **Listar Tarefas:** Recupera todas as tarefas, com paginação (`skip`, `limit`) e filtro opcional por `completed` (pendente/concluída).
-- **Ler Tarefa Única:** Retorna detalhes de uma tarefa específica pelo ID.
-- **Atualizar Tarefa:** Permite modificar o título, a descrição e o status de conclusão de uma tarefa.
-- **Deletar Tarefa:** Exclui uma tarefa do banco de dados.
+Uma API RESTful para gerenciamento de tarefas (To-Do List), desenvolvida com Python, FastAPI e SQLite. O projeto tem como foco principal aplicar boas práticas de engenharia de software e manter uma estrutura limpa e profissional.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
-- [FastAPI](https://fastapi.tiangolo.com/) - Framework web rápido para construção de APIs.
-- [SQLAlchemy](https://www.sqlalchemy.org/) - ORM para interação com o banco de dados.
-- [SQLite](https://www.sqlite.org/) - Banco de dados local leve.
-- [Pydantic](https://docs.pydantic.dev/) - Validação de dados.
-- [Pytest](https://docs.pytest.org/) - Framework de testes automatizados.
+## 📑 Sumário
+- [Stack Tecnológico](#stack-tecnológico)
+- [Funcionalidades](#funcionalidades)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Pré-requisitos e Execução](#pré-requisitos-e-execução)
+- [Documentação da API (Endpoints)](#documentação-da-api-endpoints)
+- [Testes e Linter](#testes-e-linter)
+- [Códigos de Status HTTP](#códigos-de-status-http)
+
+---
+
+## 🛠️ Stack Tecnológico
+| Camada | Tecnologia |
+|---|---|
+| **Framework** | [FastAPI](https://fastapi.tiangolo.com/) |
+| **Linguagem** | Python 3.8+ |
+| **Validação** | Pydantic |
+| **Servidor** | Uvicorn |
+| **Persistência** | SQLite (In-memory via SQLAlchemy para testes) |
+| **Testes** | Pytest |
+| **Linter** | Flake8 |
+
+---
+
+## 🚀 Funcionalidades
+- **CRUD Completo de Tarefas**: Criar, Ler, Atualizar e Deletar tarefas.
+- **Filtros**: Recuperar tarefas apenas concluídas ou pendentes.
+- **Estatísticas**: Dashboard básico retornando o quantitativo total, pendente e concluído de tarefas.
+- **Segurança e Validação**: Proteção de injeção e validação de tipos usando schemas do Pydantic.
 
 ---
 
 ## 💻 Estrutura do Projeto
 
-```
+```text
 esp-ti-es-todolist-api/
 ├── app/
-│   ├── main.py          # Ponto de entrada e rotas (endpoints)
-│   ├── crud.py          # Operações de banco de dados (Create, Read, Update, Delete)
-│   ├── models.py        # Modelos das tabelas do banco de dados
-│   ├── schemas.py       # Validações de entrada/saída (Pydantic)
-│   └── database.py      # Configuração da conexão com SQLite
+│   ├── main.py          # Ponto de entrada (entry point) e rotas principais
+│   ├── crud.py          # Lógica de acesso a dados e regras de negócio
+│   ├── models.py        # Mapeamento Objeto-Relacional (SQLAlchemy)
+│   ├── schemas.py       # Validações de request/response (Pydantic)
+│   └── database.py      # Configuração de conexão com o banco
 ├── tests/
-│   └── test_main.py     # Suite de testes automatizados
-├── requirements.txt     # Dependências do projeto
-├── .gitignore           # Arquivos e pastas a serem ignorados pelo git
-└── README.md            # Esta documentação
+│   └── test_main.py     # Suite de testes isolados rodando em SQLite :memory:
+├── Makefile             # Atalhos de terminal (make run, make test, make lint)
+├── .env.example         # Exemplo das variáveis de ambiente base
+├── .flake8              # Regras de formatação (PEP-8)
+├── requirements.txt     # Dependências para pip
+└── README.md            # Documentação central do repositório
 ```
 
 ---
 
-## ⚙️ Como Instalar e Rodar
+## ⚙️ Pré-requisitos e Execução
 
+### Passo a passo para rodar localmente:
 1. **Clone o repositório:**
    ```bash
-   git clone <url-do-repositorio>
+   git clone <sua-url>
    cd esp-ti-es-todolist-api
    ```
-
-2. **Crie um ambiente virtual (opcional, mas recomendado):**
+2. **Crie um ambiente virtual (venv):**
    ```bash
    python -m venv venv
-   
    # No Windows
    venv\Scripts\activate
-   
    # No Linux/Mac
    source venv/bin/activate
    ```
-
 3. **Instale as dependências:**
    ```bash
    pip install -r requirements.txt
    ```
-
-4. **Inicie o servidor localmente:**
+4. **Configuração inicial (opcional):**
+   Copie o modelo de ambiente usando `cp .env.example .env`.
+5. **Inicie a aplicação:**
+   Você pode usar o atalho do Makefile (`make run`) ou digitar:
    ```bash
    uvicorn app.main:app --reload
    ```
 
-5. **Acesse a Documentação Interativa:**
-   O FastAPI gera documentação automática. Abra o navegador e acesse:
-   - Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
-   - ReDoc: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+Acesse a **Documentação Interativa Swagger** gerada automaticamente em:
+[http://localhost:8000/docs](http://localhost:8000/docs)
 
 ---
 
-## 🧪 Como rodar os Testes
+## 🌐 Documentação da API (Endpoints)
 
-Com as dependências instaladas e o ambiente virtual ativado, rode o comando:
-```bash
-pytest
+Base URL Padrão: `http://localhost:8000/tasks`
+
+### 1. Obter Estatísticas (Dashboard)
+Retorna a contagem de tarefas.
+```http
+GET /tasks/stats
 ```
-Os testes utilizam um banco de dados em memória, garantindo isolamento total e rapidez.
+**Exemplo `curl`:**
+```bash
+curl http://localhost:8000/tasks/stats
+```
+**Resposta (200 OK):**
+```json
+{
+  "total": 5,
+  "pending": 3,
+  "completed": 2
+}
+```
+
+### 2. Criar uma Nova Tarefa
+```http
+POST /tasks/
+```
+**Body (JSON):**
+```json
+{
+  "title": "Aprender FastAPI",
+  "description": "Finalizar módulo de CRUD com SQLite"
+}
+```
+**Exemplo `curl`:**
+```bash
+curl -X POST http://localhost:8000/tasks/ \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Aprender FastAPI", "description": "Finalizar módulo de CRUD com SQLite"}'
+```
+
+### 3. Listar as Tarefas
+Permite paginação e filtro.
+```http
+GET /tasks/?skip=0&limit=100&completed=false
+```
+**Exemplo `curl`:**
+```bash
+curl "http://localhost:8000/tasks/?completed=false"
+```
+
+### 4. Obter Tarefa por ID
+```http
+GET /tasks/{task_id}
+```
+
+### 5. Atualizar Tarefa
+Permite atualizações parciais ou totais.
+```http
+PUT /tasks/{task_id}
+```
+**Body (JSON):**
+```json
+{
+  "completed": true
+}
+```
+
+### 6. Deletar Tarefa
+```http
+DELETE /tasks/{task_id}
+```
 
 ---
 
-## 📝 Regras de Contribuição e Commits
+## 📊 Códigos de Status HTTP
+A API utiliza as convenções restritas de código:
+| Código | Significado | Exemplo de uso na aplicação |
+|---|---|---|
+| `200 OK` | Sucesso | Retorno do GET ou de atualizações. |
+| `201 Created` | Criado | Retorno exclusivo após criação no POST. |
+| `204 No Content` | Sem conteúdo | Retorno após DELETE bem sucedido. |
+| `404 Not Found` | Não encontrado | Quando o ID da tarefa solicitada não existe no banco. |
+| `422 Unprocessable`| Erro de Validação | Quando um campo obrigatório está faltando (ex: `title`). |
 
-Este repositório segue os padrões de [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
-Exemplos utilizados no desenvolvimento:
-- `init: setup inicial do projeto com dependências e .gitignore`
-- `feat(db): configuração do banco de dados SQLite e modelos do SQLAlchemy`
-- `feat(api): implementação dos schemas Pydantic e rotas do CRUD de tarefas`
-- `test: adição da suíte de testes automatizados com Pytest`
-- `docs: criação do README.md completo com instruções de uso`
-- `chore: formatação de código e preparação para a release inicial`
+---
+
+## 🧪 Testes e Linter
+
+- **Rodar os testes unitários:**
+  ```bash
+  make test
+  ```
+  *(Ou diretamente: `pytest -v`)*
+  
+- **Verificar os padrões do código com Flake8:**
+  ```bash
+  make lint
+  ```
+  *(Ou diretamente: `flake8 app/ tests/`)*
+
+---
+
+Este projeto é desenvolvido com um histórico focado em padronização *Conventional Commits* para demonstração de versionamento saudável.
